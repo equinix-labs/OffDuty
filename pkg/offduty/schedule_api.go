@@ -8,8 +8,8 @@ import (
 	"k8s.io/klog/v2"
 )
 
-// ScheduleMap returns a map of schedule names to schedule ID's
-func ScheduleMap(ctx context.Context, c *pagerduty.Client) (map[string]string, error) {
+// ListSchedules returns a map of schedule names to schedule ID's
+func ListSchedules(ctx context.Context, c *pagerduty.Client) (map[string]string, error) {
 	opts := pagerduty.ListSchedulesOptions{}
 	m := map[string]string{}
 
@@ -30,5 +30,11 @@ func ScheduleMap(ctx context.Context, c *pagerduty.Client) (map[string]string, e
 
 		opts.Offset += uint(len(resp.Schedules))
 	}
+	return m, nil
+}
+
+// LoadSchedules returns a map of nicknames to schedule objects
+func LoadSchedules(ctx context.Context, c *pagerduty.Client, sm map[string]string, nicknames map[string]string) (map[string]*pagerduty.Schedule, error) {
+	m := map[string]*pagerduty.Schedule{}
 	return m, nil
 }

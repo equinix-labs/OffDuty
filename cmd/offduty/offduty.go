@@ -13,6 +13,7 @@ import (
 )
 
 var configPath = flag.String("config", "", "configuration file to load test cases from")
+var dryRun = flag.Bool("dry-run", false, "pretend to make changes, but do not make them")
 
 func main() {
 	klog.InitFlags(nil)
@@ -26,26 +27,26 @@ func main() {
 		klog.Exitf("unable to read config: %v", err)
 	}
 
-	dc := &offduty.Config{}
-	err = yaml.Unmarshal(f, &dc)
+	cfg := &offduty.Config{}
+	err = yaml.Unmarshal(f, &cfg)
 	if err != nil {
 		klog.Exitf("unmarshal: %w", err)
 	}
 
-	klog.Infof("read config: %+v", dc)
+	if *dryRun {
+		cfg.Options.DryRun = true
+	}
+
+	klog.Infof("read config: %+v", cfg)
 
 	token := os.Getenv("PAGERDUTY_TOKEN")
 	client := pagerduty.NewClient(token)
 	ctx := context.Background()
 
-	m, err := offduty.ScheduleMap(ctx, client)
+	os, err := offduty.Process(ctx, client, cfg)
 	if err != nil {
-		klog.Fatalf("schedule map failed: %v", err)
+		klog.Fatalf("failed processing: %v", err)
 	}
 
-	s, err := client.GetSchedule(m["Provisioning Primary"], pagerduty.GetScheduleOptions{})
-	if err != nil {
-		klog.Fatalf("get schedule: %v", err)
-	}
-	klog.Infof("get: %+v", s)
+	klog.Infof("Successfully processed %d rules, resulting in %d overrides", len(cfg.Rules), len(os))
 }
