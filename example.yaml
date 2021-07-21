@@ -1,0 +1,44 @@
+options:
+    look_ahead_days: 14
+
+overrides:
+  - name: Shabat Shalom
+    schedules:
+        - primary: "Provisioning Primary"
+        - secondary: "Provisioning Secondary"
+    users:
+        - Drake
+        - Mike D
+    days:
+        - Friday
+    start_time: "18:00"
+    override:
+        - all: Thomas Stromberg
+    fallback:
+        - $(primary)
+
+  - name: Dreamers
+    schedules:
+        - primary: "Tinkerbell 01"
+        - secondary: "Tinkerbell 02"
+    users:
+        - Ozzy Osbourne
+    start_time: "20:00"
+    end_time: "08:00"
+    override:
+        - primary: Thomas Stromberg
+        - secondary: Thomas Stromberg
+    fallback:
+        - $(primary)
+        - Tink
+
+  - name: TGIF Swap
+    schedules:
+        - "Provisioning Primary"
+    users:
+        - Party Parrot
+    days:
+        - Friday
+    override:
+        - primary: "$(secondary)"
+        - secondary: "$(primary)"
