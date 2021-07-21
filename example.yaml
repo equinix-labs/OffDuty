@@ -1,7 +1,7 @@
 options:
     look_ahead_days: 14
 
-overrides:
+rules:
   - name: Shabat Shalom
     schedules:
         - primary: "Provisioning Primary"
@@ -34,7 +34,7 @@ overrides:
 
   - name: TGIF Swap
     schedules:
-        - "Provisioning Primary"
+        - primary: "Provisioning Primary"
     users:
         - Party Parrot
     days:
