@@ -4,8 +4,7 @@ rules:
         primary: "Provisioning Primary"
         secondary: "Provisioning Secondary"
     users:
-        - Drake
-        - Mike D
+        - Nahum Shalman
     days:
         - Friday
     start_time: "18:00"

@@ -7,6 +7,7 @@ type Rule struct {
 	Days      []string          `yaml:"days"`
 	Timezone  string            `yaml:"timezone"`
 	StartTime string            `yaml:"start_time"`
+	EndTime   string            `yaml:"end_time"`
 	Override  map[string]string `yaml:"override"`
 	Fallbacks []string          `yaml:"fallbacks"`
 }
