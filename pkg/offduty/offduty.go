@@ -5,6 +5,7 @@ type Rule struct {
 	Schedules map[string]string `yaml:"schedules"`
 	Users     []string          `yaml:"users"`
 	Days      []string          `yaml:"days"`
+	Timezone  string            `yaml:"timezone"`
 	StartTime string            `yaml:"start_time"`
 	Override  map[string]string `yaml:"override"`
 	Fallbacks []string          `yaml:"fallbacks"`

@@ -17,7 +17,11 @@ func Process(ctx context.Context, client *pagerduty.Client, cfg *Config) ([]Over
 	overrides := []Override{}
 
 	for _, r := range cfg.Rules {
-		s, err := LoadSchedules(ctx, client, sm, r.Schedules)
+		if r.Timezone == "" {
+			return overrides, fmt.Errorf("rule %q does not define a timezone to operate within", r.Name)
+		}
+
+		s, err := LoadSchedules(ctx, client, sm, r.Schedules, r.Timezone)
 		if err != nil {
 			return nil, fmt.Errorf("get schedules: %w", err)
 		}
@@ -40,11 +44,5 @@ func Process(ctx context.Context, client *pagerduty.Client, cfg *Config) ([]Over
 	}
 
 	return overrides, nil
-	/*
-		s, err := client.GetSchedule(m["Provisioning Primary"], pagerduty.GetScheduleOptions{})
-		if err != nil {
-			klog.Fatalf("get schedule: %v", err)
-		}
-		klog.Infof("get: %+v", s)
-	*/
+
 }

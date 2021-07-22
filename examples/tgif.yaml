@@ -1,0 +1,11 @@
+rules:
+  - name: TGIF Swap
+    schedules:
+        primary: "Provisioning Primary"
+    users:
+        - Party Parrot
+    days:
+        - Friday
+    override:
+        primary: "$(secondary)"
+        secondary: "$(primary)"

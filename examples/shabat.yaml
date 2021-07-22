@@ -1,0 +1,16 @@
+rules:
+  - name: Shabat Shalom
+    schedules:
+        primary: "Provisioning Primary"
+        secondary: "Provisioning Secondary"
+    users:
+        - Drake
+        - Mike D
+    days:
+        - Friday
+    start_time: "18:00"
+    timezone: EST
+    override:
+        all: Thomas Stromberg
+    fallback:
+        - $(primary)

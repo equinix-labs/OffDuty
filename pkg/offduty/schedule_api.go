@@ -3,6 +3,7 @@ package offduty
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/PagerDuty/go-pagerduty"
 	"k8s.io/klog/v2"
@@ -34,7 +35,29 @@ func ListSchedules(ctx context.Context, c *pagerduty.Client) (map[string]string,
 }
 
 // LoadSchedules returns a map of nicknames to schedule objects
-func LoadSchedules(ctx context.Context, c *pagerduty.Client, sm map[string]string, nicknames map[string]string) (map[string]*pagerduty.Schedule, error) {
-	m := map[string]*pagerduty.Schedule{}
-	return m, nil
+func LoadSchedules(ctx context.Context, c *pagerduty.Client, sm map[string]string, nicknames map[string]string, tz string) (map[string]*pagerduty.Schedule, error) {
+	schedules := map[string]*pagerduty.Schedule{}
+	until := time.Now().Add(14 * 24 * time.Hour)
+	opts := pagerduty.GetScheduleOptions{
+		TimeZone: tz,
+		Since:    time.Now().Format(time.RFC3339),
+		Until:    until.Format(time.RFC3339),
+	}
+
+	for nick, full := range nicknames {
+		sid := sm[full]
+		if sid == "" {
+			return schedules, fmt.Errorf("no schedule schedule named %q: %+v", full, sm)
+		}
+
+		klog.Infof("Getting schedule %q (nick=%s, id=%s, opts=%+v) ...", full, nick, sid, opts)
+		s, err := c.GetScheduleWithContext(ctx, sid, opts)
+		if err != nil {
+			return schedules, fmt.Errorf("get schedule %q: %w", sid, err)
+		}
+
+		schedules[nick] = s
+	}
+
+	return schedules, nil
 }
