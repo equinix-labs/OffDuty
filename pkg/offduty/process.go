@@ -32,7 +32,7 @@ func Process(ctx context.Context, client *pagerduty.Client, cfg *Config) ([]Over
 		}
 
 		for _, o := range os {
-			klog.Infof("override for %q: %+v", o)
+			klog.Infof("calculated override for %q: %+v", r.Name, o)
 			if !cfg.Options.DryRun {
 				err := ApplyOverride(ctx, client, o)
 				if err != nil {

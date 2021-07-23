@@ -23,8 +23,8 @@ var dayNameToInt = map[string]int{
 
 // Similar mapping to pagerduty.Override
 type Override struct {
-	UserID   string
-	UserName string
+	User     pagerduty.APIObject
+	Schedule string
 	Start    string
 	End      string
 }
@@ -37,6 +37,8 @@ type overlap struct {
 
 // timeOverlap measures the amount of time that B overlaps with A
 func timeOverlap(sa time.Time, ea time.Time, sb time.Time, eb time.Time) *overlap {
+	klog.Infof("finding overlap: a=%s-%s, b=%s-%s", sa, ea, sb, eb)
+
 	// Does B start after the end of A?
 	if sb.After(ea) {
 		klog.Infof("no overlap, sb %s is after %s", sb, ea)
@@ -53,14 +55,17 @@ func timeOverlap(sa time.Time, ea time.Time, sb time.Time, eb time.Time) *overla
 	// If B starts after A .. the start is when B starts
 	start := sb
 	if start.Before(sa) {
+		klog.Infof("adjusting start from %s to %s", sb, sa)
 		start = sa
 	}
 
 	end := eb
-	if end.Before(ea) {
+	if end.After(ea) {
+		klog.Infof("adjusting end from %s to %s", eb, ea)
 		end = ea
 	}
 
+	klog.Infof("final overlap: %s-%s", start, end)
 	return &overlap{Start: start, End: end}
 }
 
@@ -89,8 +94,12 @@ func parseHourMin(s string) (time.Duration, error) {
 }
 
 func dailyTimeOverlaps(days []string, dStart time.Duration, dEnd time.Duration, begin time.Time, end time.Time) ([]*overlap, error) {
-	dayBegin := begin.Truncate(24 * time.Hour).Add(dStart)
-	dayEnd := begin.Truncate(24 * time.Hour).Add(dEnd)
+	klog.Infof("finding daily overlaps for %s between %s/%s and %s/%s", days, dStart, dEnd, begin, end)
+
+	matchDate := time.Date(begin.Year(), begin.Month(), begin.Day(), 0, 0, 0, 0, begin.Location())
+	matchBegin := matchDate.Add(dStart)
+	matchEnd := matchDate.Add(dEnd)
+	klog.Infof("begin=%s matchBegin=%s matchEnd=%s", begin, matchBegin, matchEnd)
 
 	includeDay := map[int]bool{}
 	for _, d := range days {
@@ -105,27 +114,27 @@ func dailyTimeOverlaps(days []string, dStart time.Duration, dEnd time.Duration, 
 
 	// Increment by day
 	for {
-		if dayBegin.After(end) || dayEnd.After(end) {
+		if matchBegin.After(end) || matchEnd.After(end) {
 			klog.Infof("breaking - time is after end: %s", end)
 			break
 		}
 
-		if !includeDay[int(dayBegin.Weekday())] {
-			klog.Infof("skipping %s - not in %s", dayBegin, days)
-			dayBegin = dayBegin.Add(24 * time.Hour)
-			dayEnd = dayBegin.Add(24 * time.Hour)
+		if !includeDay[int(matchBegin.Weekday())] {
+			klog.Infof("skipping %s - not in %s", matchBegin, days)
+			matchBegin = matchBegin.Add(24 * time.Hour)
+			matchEnd = matchEnd.Add(24 * time.Hour)
 			continue
 		}
 
-		if overlap := timeOverlap(begin, end, dayBegin, dayEnd); overlap != nil {
-			klog.Infof("found overlap: %s", overlap)
+		if overlap := timeOverlap(begin, end, matchBegin, matchEnd); overlap != nil {
+			klog.Infof("found overlap: %+v", overlap)
 			overlaps = append(overlaps, overlap)
 		}
 
 		klog.Infof("finding daily time overlaps for %s-%s between %s and %s ...", dStart, dEnd, begin, end)
 
-		dayBegin = dayBegin.Add(24 * time.Hour)
-		dayEnd = dayBegin.Add(24 * time.Hour)
+		matchBegin = matchBegin.Add(24 * time.Hour)
+		matchEnd = matchEnd.Add(24 * time.Hour)
 	}
 
 	return overlaps, nil
@@ -148,14 +157,21 @@ func CalculateOverrides(r Rule, sm map[string]*pagerduty.Schedule) ([]Override, 
 	if r.EndTime == "" {
 		r.EndTime = "24:00"
 	}
-
 	for nick, s := range sm {
+
+		uInfo := map[string]pagerduty.APIObject{}
+		for _, u := range s.Users {
+			uInfo[u.Summary] = u
+		}
+
 		klog.Infof("calculating %q overrides for %s ...", r.Name, nick, s.FinalSchedule)
 		for _, rs := range s.FinalSchedule.RenderedScheduleEntries {
 			if !umap[rs.User.Summary] && !umap[rs.User.ID] {
 				klog.Infof("Skipping %q (not in %s)", rs.User.Summary, r.Users)
 				continue
 			}
+
+			klog.Infof("%s is oncall from %s to %s ...", rs.User.Summary, rs.Start, rs.End)
 
 			start, err := iso8601.ParseString(rs.Start)
 			if err != nil {
@@ -177,17 +193,20 @@ func CalculateOverrides(r Rule, sm map[string]*pagerduty.Schedule) ([]Override, 
 				return nil, fmt.Errorf("unable to parse %q: %w", rs.End, err)
 			}
 
+			klog.Infof("Calculating overlaps for %s on %s within %s to %s for %s between %s and %s...",
+				rs.User.Summary, r.Days, dStart, dEnd, start, end)
 			os, err := dailyTimeOverlaps(r.Days, dStart, dEnd, start, end)
 			if err != nil {
 				return nil, fmt.Errorf("daily overlaps: %w", err)
 			}
 
 			for _, o := range os {
+				klog.Infof("OVERRIDE on %s[%s]: %q gets %s to %s", nick, s.ID, r.Override[nick], o.Start, o.End)
 				overrides = append(overrides, Override{
-					UserID:   rs.User.ID,
-					UserName: rs.User.Summary,
+					User:     uInfo[r.Override[nick]],
+					Schedule: s.ID,
 					Start:    o.Start.Format(time.RFC3339),
-					End:      o.Start.Format(time.RFC3339),
+					End:      o.End.Format(time.RFC3339),
 				})
 			}
 

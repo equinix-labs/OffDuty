@@ -37,7 +37,7 @@ func ListSchedules(ctx context.Context, c *pagerduty.Client) (map[string]string,
 // LoadSchedules returns a map of nicknames to schedule objects
 func LoadSchedules(ctx context.Context, c *pagerduty.Client, sm map[string]string, nicknames map[string]string, tz string) (map[string]*pagerduty.Schedule, error) {
 	schedules := map[string]*pagerduty.Schedule{}
-	until := time.Now().Add(14 * 24 * time.Hour)
+	until := time.Now().Add(21 * 24 * time.Hour)
 	opts := pagerduty.GetScheduleOptions{
 		TimeZone: tz,
 		Since:    time.Now().Format(time.RFC3339),
@@ -60,4 +60,5 @@ func LoadSchedules(ctx context.Context, c *pagerduty.Client, sm map[string]strin
 	}
 
 	return schedules, nil
+
 }
