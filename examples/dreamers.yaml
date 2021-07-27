@@ -1,15 +1,21 @@
 rules:
-  - name: Dreamers
+  - name: Dreamer Morning
     schedules:
-        primary: "Tinkerbell 01"
-        secondary: "Tinkerbell 02"
+        primary: "Provisioning Shadow"
     users:
-        - Ozzy Osbourne
-    start_time: "20:00"
+        - Scott Garman
+    start_time: "00:00"
     end_time: "08:00"
+    timezone: America/Los_Angeles
     override:
         primary: Thomas Stromberg
-        secondary: Thomas Stromberg
-    fallback:
-        - $(primary)
-        - Tink
+
+  - name: Dreamer Evening
+    schedules:
+        primary: "Provisioning Shadow"
+    users:
+        - Scott Garman
+    start_time: "18:00"
+    timezone: America/Los_Angeles
+    override:
+      primary: Thomas Stromberg

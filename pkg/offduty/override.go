@@ -94,6 +94,10 @@ func parseHourMin(s string) (time.Duration, error) {
 }
 
 func dailyTimeOverlaps(days []string, dStart time.Duration, dEnd time.Duration, begin time.Time, end time.Time) ([]*overlap, error) {
+	if len(days) == 0 {
+		days = []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
+	}
+
 	klog.Infof("finding daily overlaps for %s between %s/%s and %s/%s", days, dStart, dEnd, begin, end)
 
 	matchDate := time.Date(begin.Year(), begin.Month(), begin.Day(), 0, 0, 0, 0, begin.Location())
@@ -193,7 +197,7 @@ func CalculateOverrides(r Rule, sm map[string]*pagerduty.Schedule) ([]Override, 
 				return nil, fmt.Errorf("unable to parse %q: %w", rs.End, err)
 			}
 
-			klog.Infof("Calculating overlaps for %s on %s within %s to %s for %s between %s and %s...",
+			klog.Infof("Calculating overlaps for %s on %s within %s to %s between %s and %s...",
 				rs.User.Summary, r.Days, dStart, dEnd, start, end)
 			os, err := dailyTimeOverlaps(r.Days, dStart, dEnd, start, end)
 			if err != nil {
@@ -202,6 +206,12 @@ func CalculateOverrides(r Rule, sm map[string]*pagerduty.Schedule) ([]Override, 
 
 			for _, o := range os {
 				klog.Infof("OVERRIDE on %s[%s]: %q gets %s to %s", nick, s.ID, r.Override[nick], o.Start, o.End)
+
+				_, ok := uInfo[r.Override[nick]]
+				if !ok {
+					return nil, fmt.Errorf("%q is not a member of the %s[%s] schedule", r.Override[nick], s.Name, s.ID)
+				}
+
 				overrides = append(overrides, Override{
 					User:     uInfo[r.Override[nick]],
 					Schedule: s.ID,
