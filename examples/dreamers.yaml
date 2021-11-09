@@ -1,21 +1,25 @@
 rules:
   - name: Dreamer Morning
     schedules:
-        primary: "Provisioning Shadow"
+        primary: "Metal Primary"
+        secondary: "Metal Secondary"
     users:
-        - Scott Garman
+        - User2
     start_time: "00:00"
     end_time: "08:00"
     timezone: America/Los_Angeles
     override:
         primary: Thomas Stromberg
+        secondary: Thomas Stromberg
 
   - name: Dreamer Evening
     schedules:
-        primary: "Provisioning Shadow"
+        primary: "Metal Primary"
+        secondary: "Metal Secondary"
     users:
-        - Scott Garman
-    start_time: "18:00"
+        - User2
+    start_time: "20:00"
     timezone: America/Los_Angeles
     override:
       primary: Thomas Stromberg
+      secondary: Thomas Stromberg

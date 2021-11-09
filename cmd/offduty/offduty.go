@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/PagerDuty/go-pagerduty"
-	"github.com/tstromberg/offduty/pkg/offduty"
+	"github.com/equinix-labs/OffDuty/pkg/offduty"
 	"gopkg.in/yaml.v2"
 	"k8s.io/klog/v2"
 )
