@@ -1,0 +1,31 @@
+rules:
+  - name: Shabbat Friday
+    schedules:
+      primary: "Metal Primary"
+      secondary: "Metal Secondary"
+    users:
+      - User1
+    days:
+      - Friday
+    start_time: "16:30"
+    timezone: America/New_York
+    override:
+      primary: "Thomas Stromberg"
+      secondary: "Thomas Stromberg"
+
+  - name: Sabbath Saturday
+    schedules:
+      primary: "Metal Primary"
+      secondary: "Metal Secondary"
+    users:
+      - User1
+    days:
+      - Saturday
+    start_time: "00:00"
+    end_time: "22:00"
+    timezone: America/New_York
+    override:
+      primary: "Thomas Stromberg"
+      secondary: "Thomas Stromberg"
+    fallback:
+      - $(primary)
