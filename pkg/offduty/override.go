@@ -35,20 +35,26 @@ type overlap struct {
 	End   time.Time
 }
 
+
 // timeOverlap measures the amount of time that B overlaps with A.
-func timeOverlap(sa time.Time, ea time.Time, sb time.Time, eb time.Time) *overlap {
-	klog.Infof("finding overlap: a=%s-%s, b=%s-%s", sa, ea, sb, eb)
+func timeOverlap(sa time.Time, ea time.Time, sb time.Time, eb time.Time) (*overlap, error) {
+	klog.Infof("finding overlap: a=%s to %s && b=%s to %s", sa, ea, sb, eb)
 
 	// Does B start after the end of A?
 	if sb.After(ea) {
 		klog.Infof("no overlap, sb %s is after %s", sb, ea)
-		return nil
+		return nil, nil
+	}
+
+	if sa == eb {
+		klog.Infof("no overlap, start matches end: %s", sb)
+		return nil, nil
 	}
 
 	// Does B end before the start of A?
 	if sa.After(eb) {
 		klog.Infof("no overlap, sa %s is after %s", sa, eb)
-		return nil
+		return nil, nil
 	}
 
 	// At this point, we know there is some overlap!
@@ -66,7 +72,11 @@ func timeOverlap(sa time.Time, ea time.Time, sb time.Time, eb time.Time) *overla
 	}
 
 	klog.Infof("final overlap: %s-%s", start, end)
-	return &overlap{Start: start, End: end}
+	if start == end {
+		return nil, fmt.Errorf("calculated an invalid overlap: %s = %s", start, end)
+	}
+
+	return &overlap{Start: start, End: end}, nil
 }
 
 func parseHourMin(s string) (time.Duration, error) {
@@ -130,7 +140,12 @@ func dailyTimeOverlaps(days []string, dStart time.Duration, dEnd time.Duration, 
 			continue
 		}
 
-		if overlap := timeOverlap(begin, end, matchBegin, matchEnd); overlap != nil {
+		overlap, err := timeOverlap(begin, end, matchBegin, matchEnd)
+		if err != nil {
+			return nil, fmt.Errorf("time overlap: %w", err)
+		}
+
+		if overlap != nil {
 			klog.Infof("found overlap: %+v", overlap)
 			overlaps = append(overlaps, overlap)
 		}
