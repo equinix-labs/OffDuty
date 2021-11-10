@@ -40,6 +40,10 @@ func main() {
 	klog.Infof("read config: %+v", cfg)
 
 	token := os.Getenv("PAGERDUTY_TOKEN")
+	if token == "" {
+		klog.Exitf("$PAGERDUTY_TOKEN environment variable is unset. Get one from https://support.pagerduty.com/docs/generating-api-keys")
+	}
+
 	client := pagerduty.NewClient(token)
 	ctx := context.Background()
 
