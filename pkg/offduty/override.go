@@ -21,7 +21,7 @@ var dayNameToInt = map[string]int{
 	"Saturday":  6,
 }
 
-// Similar mapping to pagerduty.Override
+// Similar mapping to pagerduty.Override.
 type Override struct {
 	User     pagerduty.APIObject
 	Schedule string
@@ -29,13 +29,14 @@ type Override struct {
 	End      string
 }
 
-// overlap is merely a start and end time
+// overlap is merely a start and end time.
 type overlap struct {
 	Start time.Time
 	End   time.Time
 }
 
-// timeOverlap measures the amount of time that B overlaps with A
+
+// timeOverlap measures the amount of time that B overlaps with A.
 func timeOverlap(sa time.Time, ea time.Time, sb time.Time, eb time.Time) (*overlap, error) {
 	klog.Infof("finding overlap: a=%s to %s && b=%s to %s", sa, ea, sb, eb)
 
@@ -90,13 +91,13 @@ func parseHourMin(s string) (time.Duration, error) {
 	if err != nil {
 		return time.Duration(0), fmt.Errorf("unparseable hour %q: %w", h, err)
 	}
-	d = d + (time.Duration(h) * time.Hour)
+	d += (time.Duration(h) * time.Hour)
 
 	m, err := strconv.Atoi(parts[1])
 	if err != nil {
 		return time.Duration(0), fmt.Errorf("unparseable minutes %q: %w", m, err)
 	}
-	d = d + (time.Duration(m) * time.Minute)
+	d += (time.Duration(m) * time.Minute)
 
 	klog.Infof("parsed %s as %v", s, d)
 	return d, nil
@@ -156,7 +157,6 @@ func dailyTimeOverlaps(days []string, dStart time.Duration, dEnd time.Duration, 
 	}
 
 	return overlaps, nil
-
 }
 
 func CalculateOverrides(r Rule, sm map[string]*pagerduty.Schedule) ([]Override, error) {
@@ -176,7 +176,6 @@ func CalculateOverrides(r Rule, sm map[string]*pagerduty.Schedule) ([]Override, 
 		r.EndTime = "24:00"
 	}
 	for nick, s := range sm {
-
 		uInfo := map[string]pagerduty.APIObject{}
 		for _, u := range s.Users {
 			uInfo[u.Summary] = u
@@ -233,7 +232,6 @@ func CalculateOverrides(r Rule, sm map[string]*pagerduty.Schedule) ([]Override, 
 					End:      o.End.Format(time.RFC3339),
 				})
 			}
-
 		}
 	}
 	return overrides, nil

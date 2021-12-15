@@ -12,8 +12,10 @@ import (
 	"k8s.io/klog/v2"
 )
 
-var configPath = flag.String("config", "", "configuration file to load test cases from")
-var dryRun = flag.Bool("dry-run", false, "pretend to make changes, but do not make them")
+var (
+	configPath = flag.String("config", "", "configuration file to load test cases from")
+	dryRun     = flag.Bool("dry-run", false, "pretend to make changes, but do not make them")
+)
 
 func main() {
 	klog.InitFlags(nil)
@@ -47,10 +49,10 @@ func main() {
 	client := pagerduty.NewClient(token)
 	ctx := context.Background()
 
-	os, err := offduty.Process(ctx, client, cfg)
+	overrides, err := offduty.Process(ctx, client, cfg)
 	if err != nil {
 		klog.Fatalf("failed processing: %v", err)
 	}
 
-	klog.Infof("Successfully processed %d rules, resulting in %d overrides", len(cfg.Rules), len(os))
+	klog.Infof("Successfully processed %d rules, resulting in %d overrides", len(cfg.Rules), len(overrides))
 }

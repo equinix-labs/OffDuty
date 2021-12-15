@@ -44,5 +44,4 @@ func Process(ctx context.Context, client *pagerduty.Client, cfg *Config) ([]Over
 	}
 
 	return overrides, nil
-
 }

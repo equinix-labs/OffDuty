@@ -11,7 +11,7 @@ import (
 
 var LookAhead = 60 * 24 * time.Hour
 
-// ListSchedules returns a map of schedule names to schedule ID's
+// ListSchedules returns a map of schedule names to schedule ID's.
 func ListSchedules(ctx context.Context, c *pagerduty.Client) (map[string]string, error) {
 	opts := pagerduty.ListSchedulesOptions{}
 	m := map[string]string{}
@@ -36,7 +36,7 @@ func ListSchedules(ctx context.Context, c *pagerduty.Client) (map[string]string,
 	return m, nil
 }
 
-// LoadSchedules returns a map of nicknames to schedule objects
+// LoadSchedules returns a map of nicknames to schedule objects.
 func LoadSchedules(ctx context.Context, c *pagerduty.Client, sm map[string]string, nicknames map[string]string, tz string) (map[string]*pagerduty.Schedule, error) {
 	schedules := map[string]*pagerduty.Schedule{}
 	until := time.Now().Add(LookAhead)
@@ -62,5 +62,4 @@ func LoadSchedules(ctx context.Context, c *pagerduty.Client, sm map[string]strin
 	}
 
 	return schedules, nil
-
 }

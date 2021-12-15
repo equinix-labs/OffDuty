@@ -1,25 +1,25 @@
 rules:
-  - name: Dreamer Morning
-    schedules:
-        primary: "Metal Primary"
-        secondary: "Metal Secondary"
-    users:
-        - User2
-    start_time: "00:00"
-    end_time: "08:00"
-    timezone: America/Los_Angeles
-    override:
-        primary: Thomas Stromberg
-        secondary: Thomas Stromberg
+    - name: Dreamer Morning
+      schedules:
+          primary: "Metal Primary"
+          secondary: "Metal Secondary"
+      users:
+          - User2
+      start_time: "00:00"
+      end_time: "08:00"
+      timezone: America/Los_Angeles
+      override:
+          primary: Thomas Stromberg
+          secondary: Thomas Stromberg
 
-  - name: Dreamer Evening
-    schedules:
-        primary: "Metal Primary"
-        secondary: "Metal Secondary"
-    users:
-        - User2
-    start_time: "20:00"
-    timezone: America/Los_Angeles
-    override:
-      primary: Thomas Stromberg
-      secondary: Thomas Stromberg
+    - name: Dreamer Evening
+      schedules:
+          primary: "Metal Primary"
+          secondary: "Metal Secondary"
+      users:
+          - User2
+      start_time: "20:00"
+      timezone: America/Los_Angeles
+      override:
+          primary: Thomas Stromberg
+          secondary: Thomas Stromberg
