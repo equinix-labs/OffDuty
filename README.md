@@ -14,7 +14,7 @@ Generate a PagerDuty API token:
 
 Build offduty
 
-`go build ./cmd/offduty
+`go build ./cmd/offduty`
 
 Run it
 
@@ -22,4 +22,4 @@ Run it
 
 ## Configuration
 
-See `example.yaml`
+See [examples](examples)
