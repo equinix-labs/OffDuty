@@ -22,7 +22,7 @@ func main() {
 	flag.Parse()
 
 	if *configPath == "" {
-		klog.Exitf("--config is a required flag. See ./local-kubernetes.yaml, for example")
+		klog.Exitf("--config is a required flag. See examples/ dir for examples")
 	}
 	f, err := ioutil.ReadFile(*configPath)
 	if err != nil {

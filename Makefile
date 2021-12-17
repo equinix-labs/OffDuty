@@ -1,3 +1,12 @@
+.PHONY: help
+help: ## Print this help
+	@grep --no-filename -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sed 's/:.*##/·/' | sort | column -ts '·' -c 120
+
+build: ## Build the offduty binary
+	go build ./cmd/offduty
+
+lint: ## Run the linters
+
 # BEGIN: lint-install .
 # http://github.com/tinkerbell/lint-install
 
