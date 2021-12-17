@@ -35,7 +35,6 @@ type overlap struct {
 	End   time.Time
 }
 
-
 // timeOverlap measures the amount of time that B overlaps with A.
 func timeOverlap(sa time.Time, ea time.Time, sb time.Time, eb time.Time) (*overlap, error) {
 	klog.Infof("finding overlap: a=%s to %s && b=%s to %s", sa, ea, sb, eb)
